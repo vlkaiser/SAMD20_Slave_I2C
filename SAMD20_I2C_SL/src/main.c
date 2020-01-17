@@ -38,7 +38,8 @@
 uint8_t i;
 volatile bool tx_done = false, rx_done = false;
 uint8_t tx_buf[BUF_SIZE] = {1, 2, 3};
-uint8_t rx_buf[BUF_SIZE];
+uint8_t rx_buf[BUF_SIZE];
+
 
 /* Prototypes */
 void i2c_clock_init(void);
@@ -74,7 +75,8 @@ void i2c_clock_init()
  * @param[in]			- pinmux (MCU driver files for pin definitions)
  * @return				- void
  *
- * @note				- Assign I/O lines PA08 and PA09 to the SERCOM peripheral function. *						- Will switch the GPIO functionality of an I/O pin to peripheral
+ * @note				- Assign I/O lines PA08 and PA09 to the SERCOM peripheral function.
+ *						- Will switch the GPIO functionality of an I/O pin to peripheral
  *							 functionality and assigns the given peripheral function to the pin.
  ******************************************************************************************************/
 static void pin_set_peripheral_function(uint32_t pinmux)
@@ -111,15 +113,19 @@ void i2c_pin_init()
  ******************************************************************************************************/
 void i2c_slave_init()
 {
-	/* Configurations while I2C is DISABLED: */	/* Configure SERCOM_I2CM hardware register CTRLA:	*	- SDAHOLD bit field as 0x02, SDA hold time is configured for 300-600ns
+	/* Configurations while I2C is DISABLED: */
+
+	/* Configure SERCOM_I2CM hardware register CTRLA:
+	*	- SDAHOLD bit field as 0x02, SDA hold time is configured for 300-600ns
 	*	- RUNSTDBY bit as 0x01, Generic clock is enabled in all sleep modes (any interrupt can wake up the device)
 	*	- MODE bitfield to 0x4, SERCOM2 is configured as I2C Slave */
 
-		SERCOM_I2CS_CTRLA_SDAHOLD(0x2)										|
-		SERCOM_I2CS_CTRLA_RUNSTDBY											|
+		SERCOM2->I2CS.CTRLA.reg = SERCOM_I2CS_CTRLA_SDAHOLD(0x2)	|
+		SERCOM_I2CS_CTRLA_RUNSTDBY									|
 		SERCOM_I2CS_CTRLA_MODE_I2C_SLAVE;
 
-	/* Enable Smart Mode - Will ACK when DATA.DATA is read*/	SERCOM2->I2CS.CTRLB.reg = SERCOM_I2CS_CTRLB_SMEN;
+	/* Enable Smart Mode - Will ACK when DATA.DATA is read*/
+	SERCOM2->I2CS.CTRLB.reg = SERCOM_I2CS_CTRLB_SMEN;
 
 	/* Write the slave address into ADDR register */
 	SERCOM2->I2CS.ADDR.reg = SLAVE_ADDR << 1 ;
@@ -128,12 +134,14 @@ void i2c_slave_init()
 	SERCOM2->I2CS.INTENSET.reg = SERCOM_I2CS_INTENSET_PREC | SERCOM_I2CS_INTENSET_AMATCH | SERCOM_I2CS_INTENSET_DRDY;
 
 	/* SERCOM2 peripheral enabled by setting the ENABLE bit as 1*/
-	SERCOM2->I2CS.CTRLA.reg |= SERCOM_I2CS_CTRLA_ENABLE;
+	SERCOM2->I2CS.CTRLA.reg |= SERCOM_I2CS_CTRLA_ENABLE;
+
 	/* SERCOM enable synchronization busy */
-	while(SERCOM2->I2CS.SYNCBUSY.reg & SERCOM_I2CS_SYNCBUSY_ENABLE);
+	while(SERCOM2->I2CS.STATUS.bit.SYNCBUSY  & SERCOM_I2CM_STATUS_SYNCBUSY);	//Todo: TEST
 
 	/* SERCOM2 handler enabled */
-	system_interrupt_enable(SERCOM2_IRQn);
+	system_interrupt_enable(SERCOM2_IRQn);
+
 }
 
 /******************************************************************************************************
@@ -154,6 +162,7 @@ void SERCOM2_Handler(void)
 		SERCOM2->I2CS.INTFLAG.bit.AMATCH = 1;
 	}
 	/* Data Ready interrupt check */
+	//ToDo: Errata DS80000747B writing CTRLB in DRDY or AMATCH interrupts
 	if(SERCOM2->I2CS.INTFLAG.bit.DRDY)
 	{
 		/* Checking for direction,
@@ -221,6 +230,8 @@ int main (void)
 	i2c_clock_init();
 	i2c_pin_init();
 	i2c_slave_init();
+
+	
 
 	/* This skeleton code simply sets the LED to the state of the button. */
 	while (1) {

@@ -153,7 +153,7 @@ typedef union {
 #define SERCOM_I2CS_CTRLA_PINOUT    (0x1ul << SERCOM_I2CS_CTRLA_PINOUT_Pos)
 #define SERCOM_I2CS_CTRLA_SDAHOLD_Pos 20           /**< \brief (SERCOM_I2CS_CTRLA) SDA Hold Time */
 #define SERCOM_I2CS_CTRLA_SDAHOLD_Msk (0x3ul << SERCOM_I2CS_CTRLA_SDAHOLD_Pos)
-#define SERCOM_I2CS_CTRLA_SDAHOLD(value) ((SERCOM_I2CS_CTRLA_SDAHOLD_Msk & ((value) << SERCOM_I2CS_CTRLA_SDAHOLD_Pos)))
+#define SERCOM_I2CS_CTRLA_SDAHOLD(value)	((SERCOM_I2CS_CTRLA_SDAHOLD_Msk & ((value) << SERCOM_I2CS_CTRLA_SDAHOLD_Pos)))
 #define   SERCOM_I2CS_CTRLA_SDAHOLD_DIS_Val 0x0ul  /**< \brief (SERCOM_I2CS_CTRLA) Disabled */
 #define   SERCOM_I2CS_CTRLA_SDAHOLD_75_Val 0x1ul  /**< \brief (SERCOM_I2CS_CTRLA) 50-100 ns hold time */
 #define   SERCOM_I2CS_CTRLA_SDAHOLD_450_Val 0x2ul  /**< \brief (SERCOM_I2CS_CTRLA) 300-600 ns hold time */

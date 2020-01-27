@@ -38,6 +38,8 @@ __The I2C standard Fm+ (Fast-mode plus) requires a nominal high to low SCL ratio
 
 # Differences from App Note to be addressed:
 1. i2c_slave_init: No SERCOM_I2CS_CTRLA_SPEED.  Leave out.
-2. BAUD and BAUDLOW ???
-3. SYNCBUSY is undefined: 
+2. BAUD and BAUDLOW are left out.
+3. SYNCBUSY is undefined. Use: < while(SERCOM2->I2CS.STATUS.reg & SERCOM_I2CS_STATUS_SYNCBUSY); >
 4. Some of the SERCOM flags are allegedly read only.
+
+https://community.atmel.com/forum/samd20-mcu-mcu-i2c-mssl-and-datasheet-question-ctrlaspeed#comment-2837411
